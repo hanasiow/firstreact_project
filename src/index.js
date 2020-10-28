@@ -3,11 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import AddProduct from './Components/AddProducts';
+import EditProduct from './Components/EditProducts';
+import ShowProduct from './Components/ShowProducts';
+import {BrowserRouter, Route} from 'react-router-dom';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <BrowserRouter>
+    <Route exact path="/" component = {App}></Route>
+    <Route path="/create" component = {AddProduct}></Route>
+    <Route path="/show/:id" component = {ShowProduct}></Route>
+    <Route path="/edit/:id" component = {EditProduct}></Route>
+  </BrowserRouter>,
   document.getElementById('root')
 );
 
