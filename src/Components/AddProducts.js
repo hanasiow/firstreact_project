@@ -13,14 +13,17 @@ class AddProduct extends React.Component{
             name: '',
             description: '',
             url: '',
-            image: null
+            image: null,
+            check: 0
         }
     }
+
     onChange = (e) => {
         const state = this.state;
         state[e.target.name] = e.target.value;
         this.setState(state);
     }
+
     handleChange = (e) => {
         if(e.target.files[0]){
             this.setState({
@@ -29,32 +32,43 @@ class AddProduct extends React.Component{
         }
         console.log(e.target.files[0])
     }
+
     handleUpload = () =>{
+        this.setState({check: 1});
         const {image} = this.state;
         const uploadTask = firebase.storage().ref(`images/${image.name}`).put(this.state.image);
         uploadTask.on('state_changed', (snapshot)=>{console.log('snapshot')},
         (error)=>{console.log(error);},
         ()=>{firebase.storage().ref('images').child(image.name).getDownloadURL().then(url=>this.setState({url}))})
     }
+
     onSubmit = (e) => {
-        e.preventDefault();
-        const {name, description} = this.state;
-        this.ref.add({
-            name,
-            description,
-            url: this.state.url
-        }).then((docRef)=>{
-            this.setState({
-                name: '',
-                description: '',
-                url: ''
+        if(this.state.check === 1){
+            e.preventDefault();
+            const {name, description} = this.state;
+            this.ref.add({
+                name,
+                description,
+                url: this.state.url
+            }).then((docRef)=>{
+                this.setState({
+                    name: '',
+                    description: '',
+                    url: ''
+                });
+                this.props.history.push("/")
+            })
+            .catch((error)=> {
+                console.error("Error adding document: ", error);
             });
-            this.props.history.push("/")
-        })
-        .catch((error)=> {
-            console.error("Error adding document: ", error);
-        });
+            this.setState({check:0});
+        }
+        else{
+            alert("Please upload your image first");
+        }
+        
     }
+
     render(){
         const {name, description} = this.state
         const cardStyle ={
@@ -98,7 +112,7 @@ class AddProduct extends React.Component{
                         <input type = "file" onChange = {this.handleChange} />
                     </div>
                     <div className = "upload-data">
-                        <img src = {this.state.url} height = "200" width = "200" alt=""/>
+                        <img src = {this.state.url} height = "200" width = "200" />
                     </div>
                     <div className = "Buttons">
                         <button class = "Submit-Button" onClick = {this.handleUpload}>Upload Image First</button>
